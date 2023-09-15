@@ -4,17 +4,19 @@ import com.bignerdranch.android.photogallery.api.FlickrApi
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
+private const val BASE_URL = "https://api.flickr.com/"
+
 class PhotoRepository {
 
     private var flickrApi: FlickrApi
 
     init {
         val retrofit: Retrofit = Retrofit.Builder()
-            .baseUrl("https://www.flickr.com/")
+            .baseUrl(BASE_URL)
             .addConverterFactory(ScalarsConverterFactory.create())
             .build()
         flickrApi = retrofit.create(FlickrApi::class.java)
     }
 
-    suspend fun fetchContents() = flickrApi.fetchContents()
+    suspend fun fetchPhotos() = flickrApi.fetchContents()
 }
