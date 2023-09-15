@@ -27,7 +27,7 @@ class PhotoGalleryFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentPhotoGalleryBinding.inflate(inflater, container, false)
         binding.photoGrid.layoutManager = GridLayoutManager(context, 3)
         return binding.root
