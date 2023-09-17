@@ -1,11 +1,13 @@
 package com.bignerdranch.android.photogallery
 
+import PhotoGalleryViewModel
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bignerdranch.android.photogallery.databinding.FragmentPhotoGalleryBinding
@@ -18,6 +20,8 @@ private const val TAG = "PhotoGalleryFragment"
  */
 class PhotoGalleryFragment : Fragment() {
     private var _binding: FragmentPhotoGalleryBinding? = null
+
+    private val photoGalleryViewModel: PhotoGalleryViewModel by viewModels()
 
     private val binding
         get() = checkNotNull(_binding) {
@@ -37,8 +41,10 @@ class PhotoGalleryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            val response = PhotoRepository().fetchPhotos()
-            Log.d(TAG, "Response received: $response")
+            photoGalleryViewModel.galleryItems.collect {items ->
+                Log.d(TAG, "Response received: $items")
+                // TODO display the values
+            }
         }
     }
 
