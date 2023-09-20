@@ -41,9 +41,9 @@ class PhotoGalleryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            photoGalleryViewModel.galleryItems.collect {items ->
+            photoGalleryViewModel.galleryItems.collect { items ->
                 Log.d(TAG, "Response received: $items")
-                // TODO display the values
+                binding.photoGrid.adapter = PhotoListAdapter(items)
             }
         }
     }
