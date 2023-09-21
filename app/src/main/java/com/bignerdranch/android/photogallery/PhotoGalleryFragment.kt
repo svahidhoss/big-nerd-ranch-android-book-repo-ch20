@@ -1,6 +1,5 @@
 package com.bignerdranch.android.photogallery
 
-import PhotoGalleryViewModel
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment

@@ -1,7 +1,8 @@
+package com.bignerdranch.android.photogallery
+
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bignerdranch.android.photogallery.PhotoRepository
 import com.bignerdranch.android.photogallery.api.GalleryItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -9,7 +10,6 @@ import kotlinx.coroutines.launch
 import java.lang.Exception
 
 private const val TAG = "PhotoGalleryViewModel"
-
 class PhotoGalleryViewModel : ViewModel() {
 
     private val photoRepository = PhotoRepository()
