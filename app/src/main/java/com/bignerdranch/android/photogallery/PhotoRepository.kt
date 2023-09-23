@@ -33,7 +33,7 @@ class PhotoRepository {
         flickrApi = retrofit.create(FlickrApi::class.java)
     }
 
-    suspend fun fetchPhotos(page: Int = 1) = flickrApi.fetchPhotos(page).photos.galleryItems
+    suspend fun fetchPhotos(page: Int = 1) = flickrApi.fetchPhotos(page)
 
     fun getSearchResultStream(): Flow<PagingData<GalleryItem>> {
         return Pager(
