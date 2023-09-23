@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bignerdranch.android.photogallery.databinding.FragmentPhotoGalleryBinding
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 private const val TAG = "PhotoGalleryFragment"
@@ -39,10 +40,12 @@ class PhotoGalleryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val photoListAdapter = PhotoListAdapter()
+        binding.photoGrid.adapter = photoListAdapter
         viewLifecycleOwner.lifecycleScope.launch {
-            photoGalleryViewModel.galleryItems.collect { items ->
+            photoGalleryViewModel.galleryItems.collectLatest { items ->
                 Log.d(TAG, "Response received: $items")
-                binding.photoGrid.adapter = PhotoListAdapter(items)
+                photoListAdapter.submitData(items)
             }
         }
     }

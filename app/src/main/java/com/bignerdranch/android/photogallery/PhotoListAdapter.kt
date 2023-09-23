@@ -2,26 +2,34 @@ package com.bignerdranch.android.photogallery
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.bignerdranch.android.photogallery.api.GalleryItem
 import com.bignerdranch.android.photogallery.databinding.ListItemGalleryBinding
 
-class PhotoListAdapter(private val galleryItems: List<GalleryItem>) :
-    RecyclerView.Adapter<PhotoViewHolder>() {
+class PhotoListAdapter :
+    PagingDataAdapter<GalleryItem, PhotoViewHolder>(ARTICLE_DIFF_CALLBACK) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ListItemGalleryBinding.inflate(inflater, parent, false)
         return PhotoViewHolder(binding)
     }
 
-    override fun getItemCount(): Int {
-        return galleryItems.size
+    override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
+        val item = getItem(position)
+        item?.let { holder.bind(it) }
     }
 
-    override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
-        val item = galleryItems[position]
-        holder.bind(item)
+    companion object {
+        private val ARTICLE_DIFF_CALLBACK = object : DiffUtil.ItemCallback<GalleryItem>() {
+            override fun areItemsTheSame(oldItem: GalleryItem, newItem: GalleryItem): Boolean =
+                oldItem.id == newItem.id
+
+            override fun areContentsTheSame(oldItem: GalleryItem, newItem: GalleryItem): Boolean =
+                oldItem == newItem
+        }
     }
 }
 
