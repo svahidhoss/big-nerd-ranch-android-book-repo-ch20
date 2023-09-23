@@ -38,7 +38,7 @@ class PhotoViewHolder(private val binding: ListItemGalleryBinding) :
 
     fun bind(galleryItem: GalleryItem) {
         binding.itemImageView.load(galleryItem.url) {
-            placeholder(R.drawable.bill_up_close)
+            placeholder(R.drawable.ic_downloading)
             crossfade(true)
         }
     }
