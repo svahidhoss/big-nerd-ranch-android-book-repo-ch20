@@ -1,8 +1,10 @@
 package com.bignerdranch.android.photogallery
 
 import com.bignerdranch.android.photogallery.api.FlickrApi
+import com.bignerdranch.android.photogallery.api.PhotoInterceptor
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
@@ -20,6 +22,10 @@ object Injection {
      * Creates an instance of [FlickrApi].
      */
     private fun provideFlickrApi(): FlickrApi {
+        val okHttpClient = OkHttpClient.Builder()
+            .addInterceptor(PhotoInterceptor())
+            .build()
+
         // Kotlin reflection adapter
         val moshi = Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
@@ -28,6 +34,7 @@ object Injection {
         val retrofit: Retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .client(okHttpClient)
             .build()
         return retrofit.create(FlickrApi::class.java)
     }
