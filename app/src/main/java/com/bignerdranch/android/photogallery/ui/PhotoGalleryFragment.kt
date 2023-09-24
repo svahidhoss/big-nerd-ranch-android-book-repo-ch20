@@ -1,4 +1,4 @@
-package com.bignerdranch.android.photogallery
+package com.bignerdranch.android.photogallery.ui
 
 import android.os.Bundle
 import android.util.Log

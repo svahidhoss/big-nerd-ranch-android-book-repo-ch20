@@ -1,9 +1,11 @@
-package com.bignerdranch.android.photogallery
+package com.bignerdranch.android.photogallery.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.bignerdranch.android.photogallery.Injection
+import com.bignerdranch.android.photogallery.PhotoRepository
 import com.bignerdranch.android.photogallery.api.GalleryItem
 import kotlinx.coroutines.flow.Flow
 
