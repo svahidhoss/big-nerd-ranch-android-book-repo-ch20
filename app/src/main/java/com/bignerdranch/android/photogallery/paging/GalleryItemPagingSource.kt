@@ -31,7 +31,8 @@ class GalleryItemPagingSource : PagingSource<Int, GalleryItem>() {
         var totalPages = 0
 
         try {
-            val flickrResponse = photoRepository.searchPhotos("gay cub", page = nextPageNumber)
+            // val flickrResponse = photoRepository.fetchPhotos(nextPageNumber)
+            val flickrResponse = photoRepository.searchPhotos("planets", page = nextPageNumber)
             items = flickrResponse.photos.galleryItems
             totalPages = flickrResponse.photos.totalPages
             Log.d(TAG, "Items received: $items")
