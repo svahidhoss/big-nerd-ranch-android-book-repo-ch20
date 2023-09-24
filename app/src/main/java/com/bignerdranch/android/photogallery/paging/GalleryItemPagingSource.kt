@@ -3,6 +3,7 @@ package com.bignerdranch.android.photogallery.paging
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.bignerdranch.android.photogallery.Injection
 import com.bignerdranch.android.photogallery.PhotoRepository
 import com.bignerdranch.android.photogallery.api.GalleryItem
 import java.lang.Exception
@@ -13,7 +14,7 @@ private const val TAG = "GalleryItemPagingSource"
 
 class GalleryItemPagingSource : PagingSource<Int, GalleryItem>() {
 
-    private val photoRepository = PhotoRepository()
+    private val photoRepository = PhotoRepository(Injection.getFlickrApi())
 
     override fun getRefreshKey(state: PagingState<Int, GalleryItem>): Int? {
         return state.anchorPosition?.let { anchorPosition ->

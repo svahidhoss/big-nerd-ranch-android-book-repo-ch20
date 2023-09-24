@@ -11,7 +11,7 @@ private const val TAG = "PhotoGalleryViewModel"
 
 class PhotoGalleryViewModel : ViewModel() {
 
-    private val photoRepository = PhotoRepository()
+    private val photoRepository = PhotoRepository(Injection.getFlickrApi())
 
     val galleryItems: Flow<PagingData<GalleryItem>> =
         photoRepository.getSearchResultStream().cachedIn(viewModelScope)
