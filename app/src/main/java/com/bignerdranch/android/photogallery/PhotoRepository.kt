@@ -14,6 +14,8 @@ class PhotoRepository(private var flickrApi: FlickrApi) {
 
     suspend fun fetchPhotos(page: Int = 1) = flickrApi.fetchPhotos(page)
 
+    suspend fun searchPhotos(query: String, page: Int = 1) = flickrApi.searchPhotos(query, page)
+
     fun getSearchResultStream(): Flow<PagingData<GalleryItem>> {
         return Pager(
             config = PagingConfig(
