@@ -8,11 +8,13 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bignerdranch.android.photogallery.R
 import com.bignerdranch.android.photogallery.databinding.FragmentPhotoGalleryBinding
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -45,15 +47,27 @@ class PhotoGalleryFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    private var dataCollectionJob: Job? = null
 
-        val photoListAdapter = PhotoListAdapter()
-        binding.photoGrid.adapter = photoListAdapter
-        viewLifecycleOwner.lifecycleScope.launch {
+    private fun startCollectingGalleryItems() {
+        dataCollectionJob = viewLifecycleOwner.lifecycleScope.launch {
             photoGalleryViewModel.galleryItems.collectLatest { items ->
                 Log.d(TAG, "Response received: $items")
-                photoListAdapter.submitData(items)
+                (binding.photoGrid.adapter as PhotoListAdapter).submitData(items)
+            }
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.photoGrid.adapter = PhotoListAdapter()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            photoGalleryViewModel.queryState.collect { query ->
+                dataCollectionJob?.cancel()
+                // Update UI with new state
+                photoGalleryViewModel.fetchGalleryItems(query)
+                startCollectingGalleryItems()
             }
         }
     }
@@ -66,5 +80,22 @@ class PhotoGalleryFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.fragment_photo_gallery, menu)
+
+        val searchItem = menu.findItem(R.id.menu_item_search)
+        val searchView = searchItem.actionView as? SearchView
+
+        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                Log.d(TAG, "QueryTextSubmit: $query")
+                photoGalleryViewModel.setQuery(query ?: "")
+                (binding.photoGrid.adapter as PhotoListAdapter).refresh()
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                Log.d(TAG, "QueryTextChange: $newText")
+                return false
+            }
+        })
     }
 }

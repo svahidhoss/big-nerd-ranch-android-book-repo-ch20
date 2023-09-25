@@ -5,6 +5,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.bignerdranch.android.photogallery.Injection
 import com.bignerdranch.android.photogallery.PhotoRepository
+import com.bignerdranch.android.photogallery.api.FlickrResponse
 import com.bignerdranch.android.photogallery.api.GalleryItem
 import java.lang.Exception
 
@@ -12,7 +13,7 @@ private const val STARTING_KEY = 1
 
 private const val TAG = "GalleryItemPagingSource"
 
-class GalleryItemPagingSource : PagingSource<Int, GalleryItem>() {
+class GalleryItemPagingSource(private val query: String) : PagingSource<Int, GalleryItem>() {
 
     private val photoRepository = PhotoRepository(Injection.getFlickrApi())
 
@@ -24,15 +25,15 @@ class GalleryItemPagingSource : PagingSource<Int, GalleryItem>() {
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GalleryItem> {
-
         // Start paging with the STARTING_KEY if this is the first load
         val nextPageNumber = params.key ?: STARTING_KEY
         var items = emptyList<GalleryItem>()
         var totalPages = 0
 
         try {
-            // val flickrResponse = photoRepository.fetchPhotos(nextPageNumber)
-            val flickrResponse = photoRepository.searchPhotos("planets", page = nextPageNumber)
+            val flickrResponse: FlickrResponse =
+                if (query.isBlank()) photoRepository.fetchPhotos(nextPageNumber)
+                else photoRepository.searchPhotos(query, page = nextPageNumber)
             items = flickrResponse.photos.galleryItems
             totalPages = flickrResponse.photos.totalPages
             Log.d(TAG, "Items received: $items")
