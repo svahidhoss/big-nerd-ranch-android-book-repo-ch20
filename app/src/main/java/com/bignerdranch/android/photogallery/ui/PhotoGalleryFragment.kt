@@ -12,10 +12,13 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bignerdranch.android.photogallery.R
+import com.bignerdranch.android.photogallery.api.GalleryItem
 import com.bignerdranch.android.photogallery.databinding.FragmentPhotoGalleryBinding
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -26,6 +29,8 @@ private const val TAG = "PhotoGalleryFragment"
  */
 class PhotoGalleryFragment : Fragment() {
     private var _binding: FragmentPhotoGalleryBinding? = null
+
+    private var searchView: SearchView? = null
 
     private val photoGalleryViewModel: PhotoGalleryViewModel by viewModels()
 
@@ -50,9 +55,9 @@ class PhotoGalleryFragment : Fragment() {
 
     private var dataCollectionJob: Job? = null
 
-    private fun startCollectingGalleryItems() {
+    private fun startCollectingGalleryItems(pagingDataFlow: Flow<PagingData<GalleryItem>>) {
         dataCollectionJob = viewLifecycleOwner.lifecycleScope.launch {
-            photoGalleryViewModel.galleryItems.collectLatest { items ->
+            pagingDataFlow.collectLatest { items ->
                 Log.d(TAG, "Response received: $items")
                 (binding.photoGrid.adapter as PhotoListAdapter).submitData(items)
             }
@@ -64,11 +69,12 @@ class PhotoGalleryFragment : Fragment() {
         binding.photoGrid.adapter = PhotoListAdapter()
 
         viewLifecycleOwner.lifecycleScope.launch {
-            photoGalleryViewModel.queryState.collect { query ->
+            photoGalleryViewModel.uiState.collect { state ->
+                searchView?.setQuery(state.query, false)
                 dataCollectionJob?.cancel()
+                (binding.photoGrid.adapter as PhotoListAdapter).refresh()
                 // Update UI with new state
-                photoGalleryViewModel.fetchGalleryItems(query)
-                startCollectingGalleryItems()
+                startCollectingGalleryItems(state.pagingDataFlow)
             }
         }
     }
@@ -83,13 +89,12 @@ class PhotoGalleryFragment : Fragment() {
         inflater.inflate(R.menu.fragment_photo_gallery, menu)
 
         val searchItem = menu.findItem(R.id.menu_item_search)
-        val searchView = searchItem.actionView as? SearchView
+        searchView = searchItem.actionView as? SearchView
 
         searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 Log.d(TAG, "QueryTextSubmit: $query")
                 photoGalleryViewModel.setQuery(query ?: "")
-                (binding.photoGrid.adapter as PhotoListAdapter).refresh()
                 return true
             }
 
@@ -109,5 +114,10 @@ class PhotoGalleryFragment : Fragment() {
 
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onDestroyOptionsMenu() {
+        super.onDestroyOptionsMenu()
+        searchView = null
     }
 }

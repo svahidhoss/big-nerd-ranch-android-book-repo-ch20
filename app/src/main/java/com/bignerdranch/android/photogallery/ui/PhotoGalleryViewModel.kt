@@ -12,7 +12,10 @@ import com.bignerdranch.android.photogallery.api.GalleryItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
@@ -23,18 +26,24 @@ class PhotoGalleryViewModel : ViewModel() {
     private val photoRepository = PhotoRepository(Injection.getFlickrApi())
     private val preferencesRepository = PreferencesRepository.get()
 
-    private val _queryState = MutableStateFlow("")
-    val queryState: StateFlow<String> = _queryState
-
-    lateinit var galleryItems: Flow<PagingData<GalleryItem>>
+    private val _uiState: MutableStateFlow<PhotoGalleryUiState> =
+        MutableStateFlow(PhotoGalleryUiState())
+    val uiState: StateFlow<PhotoGalleryUiState>
+        get() = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
             preferencesRepository.storedQuery.collectLatest { storedQuery ->
                 try {
-                    _queryState.value = storedQuery
-                    galleryItems =
-                        photoRepository.getSearchResultStream(storedQuery).cachedIn(viewModelScope)
+                    val searchResultStream = photoRepository.getSearchResultStream(storedQuery)
+
+                    _uiState.update { oldState ->
+                        oldState.copy(
+                            pagingDataFlow = searchResultStream
+                                .cachedIn(viewModelScope),
+                            query = storedQuery
+                        )
+                    }
                 } catch (e: Exception) {
                     Log.e(TAG, "Failed to fetch gallery items", e)
                 }
@@ -44,10 +53,10 @@ class PhotoGalleryViewModel : ViewModel() {
 
     fun setQuery(query: String) {
         viewModelScope.launch { preferencesRepository.setStoredQuery(query) }
-//        _queryState.value = query
-    }
-
-    fun fetchGalleryItems(query: String) {
-        galleryItems = photoRepository.getSearchResultStream(query).cachedIn(viewModelScope)
     }
 }
+
+data class PhotoGalleryUiState(
+    val pagingDataFlow: Flow<PagingData<GalleryItem>> = emptyFlow(),
+    val query: String = ""
+)
