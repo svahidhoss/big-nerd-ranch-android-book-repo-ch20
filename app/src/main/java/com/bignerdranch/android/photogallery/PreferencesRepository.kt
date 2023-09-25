@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.map
 import java.lang.IllegalStateException
 
 class PreferencesRepository(private val dataStore: DataStore<Preferences>) {
+
     val storedQuery: Flow<String> = dataStore.data.map {
         it[SEARCH_QUERY_KEY] ?: ""
     }.distinctUntilChanged()
