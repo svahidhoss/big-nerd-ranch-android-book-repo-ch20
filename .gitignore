@@ -1,5 +1,6 @@
+# Intellij
 *.iml
-.gradle
+.idea/
 /local.properties
 /.idea/caches
 /.idea/libraries
@@ -7,12 +8,12 @@
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+# OS X
 .DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
-local.properties
 
 # Built application files
 *.apk
@@ -30,10 +31,12 @@ gen/
 out/
 
 # Gradle files
+.gradle
 .gradle/
 build/
 !taskcluster/ci/build/
 .build-cache/
+gradle.properties
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -51,18 +54,11 @@ proguard/
 # Android Studio captures folder
 captures/
 
-# Intellij
-*.iml
-.idea/
-
 # Vim swap files
 *.sw[op]
 
 # Keystore files
 *.jks
-
-# OS X
-.DS_Store
 
 # jacoco.exec
 jacoco.exec

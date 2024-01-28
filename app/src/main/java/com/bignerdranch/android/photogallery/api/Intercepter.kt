@@ -1,11 +1,12 @@
 package com.bignerdranch.android.photogallery.api
 
+import com.bignerdranch.android.photogallery.BuildConfig
 import okhttp3.HttpUrl
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 
-const val API_KEY = "597e12ab23165ecbe8e1192d625e9318"
+const val API_KEY = BuildConfig.API_KEY
 
 class PhotoInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
